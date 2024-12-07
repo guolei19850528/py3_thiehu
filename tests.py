@@ -10,14 +10,14 @@ class MyTestCase(unittest.TestCase):
             parking_id="aa",
             app_key="aa"
         )
-        s,r=pklot.request_with_signature(
+        s=pklot.request_with_signature(
                 url="/cxzn/interface/queryPklot",
                 json={
                     "parkingId": "aa",
                 }
             )
         print(
-            r.json()
+            s
         )
         self.assertTrue(True, "ok")  # add assertion here
 

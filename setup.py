@@ -25,10 +25,10 @@ setup(
     author="guolei",
     author_email="174000902@qq.com",
     license="MIT",
-    keywors=["tiehu", "铁虎", "停车", "智慧车场", "物管", "智慧社区"],
+    keywors=["tiehu", "铁虎", "停车", "智慧车场", "物管", "智慧社区", "guolei", "郭磊"],
     packages=setuptools.find_packages('./'),
     install_requires=[
-        "requests",
+        "py3-requests",
         "addict",
         "retrying",
         "jsonschema",
