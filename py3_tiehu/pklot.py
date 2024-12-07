@@ -146,7 +146,6 @@ class Pklot(object):
             },
             **kwargs["json"],
         }
-        print(kwargs)
         return py3_requests.request(
             **kwargs.to_dict()
         )
