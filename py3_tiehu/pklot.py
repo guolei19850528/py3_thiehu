@@ -17,61 +17,50 @@ from addict import Dict
 from jsonschema.validators import Draft202012Validator
 from requests import Response
 
+request_urls = Dict()
+request_urls.cxzn_interface_queryPklot = "/cxzn/interface/queryPklot"
+request_urls.cxzn_interface_getParkCarType = "/cxzn/interface/getParkCarType"
+request_urls.cxzn_interface_getParkCarModel = "/cxzn/interface/getParkCarModel"
+request_urls.cxzn_interface_payMonthly = "/cxzn/interface/payMonthly"
+request_urls.cxzn_interface_addVisit = "/cxzn/interface/addVisit"
+request_urls.cxzn_interface_lockCar = "/cxzn/interface/lockCar"
+request_urls.cxzn_interface_getParkinfo = "/cxzn/interface/getParkinfo"
+request_urls.cxzn_interface_addParkBlack = "/cxzn/interface/addParkBlack"
+request_urls.cxzn_interface_delParkBlacklist = "/cxzn/interface/delParkBlacklist"
+request_urls.cxzn_interface_getParkGate = "/cxzn/interface/getParkGate"
+request_urls.cxzn_interface_openGate = "/cxzn/interface/openGate"
+request_urls.cxzn_interface_saveMonthlyRent = "/cxzn/interface/saveMonthlyRent"
+request_urls.cxzn_interface_delMonthlyRent = "/cxzn/interface/delMonthlyRent"
+request_urls.cxzn_interface_getMonthlyRent = "/cxzn/interface/getMonthlyRent"
+request_urls.cxzn_interface_getMonthlyRentList = "/cxzn/interface/getMonthlyRentList"
+request_urls.cxzn_interface_delMonthlyRentList = "/cxzn/interface/delMonthlyRentList"
+request_urls.cxzn_interface_getParkDeviceState = "/cxzn/interface/getParkDeviceState"
+request_urls.cxzn_interface_upatePlateInfo = "/cxzn/interface/upatePlateInfo"
+request_urls.cxzn_interface_getParkBlackList = "/cxzn/interface/getParkBlackList"
+request_urls.cxzn_interface_deleteVisit = "/cxzn/interface/deleteVisit"
 
-class RequestUrl:
-    QUERYPKLOT_URL = "/cxzn/interface/queryPklot"
-    GETPARKCARTYPE_URL = "/cxzn/interface/getParkCarType"
-    GETPARKCARMODEL_URL = "/cxzn/interface/getParkCarModel"
-    PAYMONTHLY_URL = "/cxzn/interface/payMonthly"
-    ADDVISIT_URL = "/cxzn/interface/addVisit"
-    LOCKCAR_URL = "/cxzn/interface/lockCar"
-    GETPARKINFO_URL = "/cxzn/interface/getParkinfo"
-    ADDPARKBLACK_URL = "/cxzn/interface/addParkBlack"
-    DELPARKBLACKLIST_URL = "/cxzn/interface/delParkBlacklist"
-    GETPARKGATE_URL = "/cxzn/interface/getParkGate"
-    OPENGATE_URL = "/cxzn/interface/openGate"
-    SAVEMONTHLYRENT_URL = "/cxzn/interface/saveMonthlyRent"
-    DELMONTHLYRENT_URL = "/cxzn/interface/delMonthlyRent"
-    GETMONTHLYRENT_URL = "/cxzn/interface/getMonthlyRent"
-    GETMONTHLYRENTLIST_URL = "/cxzn/interface/getMonthlyRentList"
-    DELMONTHLYRENTLIST_URL = "/cxzn/interface/delMonthlyRentList"
-    GETPARKDEVICESTATE_URL = "/cxzn/interface/getParkDeviceState"
-    UPATEPLATEINFO_URL = "/cxzn/interface/upatePlateInfo"
-    GETPARKBLACKLIST_URL = "/cxzn/interface/getParkBlackList"
-    DELETEVISITT_URL = "/cxzn/interface/deleteVisit"
-
-
-class ValidatorJsonSchema:
-    """
-    json schema settings
-    """
-    NORMAL_SCHEMA = {
-        "type": "object",
-        "properties": {
-            "status": {
-                "oneOf": [
-                    {"type": "integer", "const": 1},
-                    {"type": "string", "const": "1"},
-                ]
-            },
+validator_json_schemas = Dict()
+validator_json_schemas.normal = Dict({
+    "type": "object",
+    "properties": {
+        "status": {
+            "oneOf": [
+                {"type": "integer", "const": 1},
+                {"type": "string", "const": "1"},
+            ]
         },
-        "required": ["status", "Data"]
-    }
+    },
+    "required": ["status", "Data"]
+})
 
 
-class ResponseHandler:
-    """
-    response handler
-    """
-
-    @staticmethod
-    def normal_handler(response: Response = None):
-        if isinstance(response, Response) and response.status_code == 200:
-            json_addict = Dict(response.json())
-            if Draft202012Validator(ValidatorJsonSchema.NORMAL_SCHEMA).is_valid(instance=json_addict):
-                return Dict(json.loads(json_addict.get("Data", "")))
-            return None
-        raise Exception(f"Response Handler Error {response.status_code}|{response.text}")
+def normal_response_handler(response: Response = None):
+    if isinstance(response, Response) and response.status_code == 200:
+        json_addict = Dict(response.json())
+        if Draft202012Validator(validator_json_schemas.normal).is_valid(instance=json_addict):
+            return Dict(json.loads(json_addict.get("Data", "")))
+        return None
+    raise Exception(f"Response Handler Error {response.status_code}|{response.text}")
 
 
 class Pklot(object):
@@ -96,17 +85,14 @@ class Pklot(object):
         self.parking_id = parking_id
         self.app_key = app_key
 
-    def signature(
-            self,
-            data: dict = {},
-    ):
+    def signature(self,data: dict = {}):
         """
         @see https://www.showdoc.com.cn/1735808258920310/8113601111753119
         :param data:
         :return:
         """
         temp_string = ""
-        data = data if isinstance(data, dict) else {}
+        data = Dict(data)
         if data.keys():
             data_sorted = sorted(data.keys())
             if isinstance(data_sorted, list):
@@ -118,10 +104,7 @@ class Pklot(object):
                 ]) + f"{hashlib.md5(self.app_key.encode('utf-8')).hexdigest().upper()}"
         return hashlib.md5(temp_string.encode('utf-8')).hexdigest().upper()
 
-    def request_with_signature(
-            self,
-            **kwargs
-    ):
+    def request_with_signature(self,**kwargs):
         """
         request with signature
         :param kwargs:
@@ -129,8 +112,8 @@ class Pklot(object):
         """
         kwargs = Dict(kwargs)
         kwargs.setdefault("method", "POST")
-        kwargs.setdefault("response_handler", ResponseHandler.normal_handler)
-        kwargs.setdefault("url", f"")
+        kwargs.setdefault("response_handler", normal_response_handler)
+        kwargs.setdefault("url", "")
         if not kwargs.get("url", "").startswith("http"):
             kwargs["url"] = self.base_url + kwargs["url"]
         kwargs.setdefault("json", Dict())
