@@ -21,7 +21,6 @@ from requests import Response
 class RequestUrl(py3_requests.RequestUrl):
     CXZN_INTERFACE_QUERYPKLOT = "/cxzn/interface/queryPklot"
     CXZN_INTERFACE_GETPARKCARTYPE = "/cxzn/interface/getParkCarType"
-    CXZN_INTERFACE_GETPARKCARTYPE = "/cxzn/interface/getParkCarType"
     CXZN_INTERFACE_GETPARKCARMODEL = "/cxzn/interface/getParkCarModel"
     CXZN_INTERFACE_PAYMONTHLY = "/cxzn/interface/payMonthly"
     CXZN_INTERFACE_ADDVISIT = "/cxzn/interface/addVisit"
